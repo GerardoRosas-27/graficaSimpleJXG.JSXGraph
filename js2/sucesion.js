@@ -53,8 +53,6 @@ board.create('ticks', [ejeX, 1], { // The number here is the distance between Ma
 }
 );
 
-
-
 var ejeY = board.create('axis', [[0, 0], [0, 1]], {
 
 	ticks: {
@@ -68,84 +66,55 @@ var ejeY = board.create('axis', [[0, 0], [0, 1]], {
 });
 
 
-//---------------------------Dibuja rectas épsilon--------------------//
-
-/*		var epsilon=0.5
-
-		var p1_eps=board.create('point',[0,1-epsilon],{
-			name:'',
-			fixed:true,
-		});
-		var p2_eps=board.create('point',[0,1+epsilon],{
-			name:'',
-			fixed:true,
-		});
-
-		var recta1 = board.create('line',[p1_eps,p2_eps], {
-			straightFirst:false, 
-			straightLast:false, 
-			strokeWidth:4,
-
-		});*/
-
 var epsilon = 0
 var limite = 1
 
 var estaDesarrollo = false;
 var estaCalcula = false;
-
-/*
-var p1_limit = board.create('point', [0, limite], {
-	name: '',
-	fixed: true,
-});
-var p2_limit = board.create('point', [30, limite], {
-	name: '',
-	fixed: true,
-});
-
-
-
-
-board.create('line', [p1_limit, p2_limit], {
-	straightFirst: false,
-	straightLast: false,
-	strokeWidth: 1,
-});
-
-*/
-
-
-
-
+var colorVerde = "#1e8219";
 
 //---------------------------Dibuja rectángulo --------------------//
 
 var p1_eps = board.create('point', [0, 1], {
 	name: '',
 	fixed: true,
-	color:"#ffffff"
+	color: "#0b0eb3",
+	size: 5,
 });
+var p1_eps2 = board.create('point', [0, 1], {
+	name: '',
+	fixed: true,
+	color: "#ffffff",
+	size: 3,
+});
+
 
 var p2_eps = board.create('point', [0, 1], {
 	name: '',
 	fixed: true,
-	color:"#ffffff"
+	color: "#0b0eb3",
+	size: 5,
+});
+var p2_eps2 = board.create('point', [0, 1], {
+	name: '',
+	fixed: true,
+	color: "#ffffff",
+	size: 3,
 });
 
 var p3_eps = board.create('point', [30, 1], {
 	name: '',
 	fixed: true,
-	color:"#ffffff"
+	color: "#ffffff"
 });
 var p4_eps = board.create('point', [30, 1], {
 	name: '',
 	fixed: true,
-	color:"#ffffff"
+	color: "#ffffff"
 });
 
 
- board.create('polygon', [p1_eps, p2_eps, p4_eps, p3_eps], {
+board.create('polygon', [p1_eps, p2_eps, p4_eps, p3_eps], {
 	borders: {
 		strokeColor: 'black',
 		dash: 2,
@@ -161,7 +130,8 @@ function animaLimite() {
 	board.create("line", [[0, limite], [30, limite]], {
 		straightFirst: false,
 		straightLast: false,
-		strokeWidth: 1
+		strokeWidth: 1,
+		strokeColor: "#5a5ce9"
 	});
 }
 
@@ -178,7 +148,7 @@ function animaSucesion() {
 			await new Promise(resolve => setTimeout(() => {
 				board.create('point', [i, function (x) {
 					return i / (i + 1);
-				}], { name: 'p: ' + i });
+				}], { name: 'p: ' + i, color: colorVerde });
 				resolve();
 			}, 400));
 		}
@@ -192,14 +162,18 @@ function animaRegion() {
 	incX = parseFloat(limite) + parseFloat(epsilon);
 	decX = parseFloat(limite) - parseFloat(epsilon);
 	p1_eps.moveTo([0, incX], 250);
+	p1_eps2.moveTo([0, incX], 250);
 	p2_eps.moveTo([0, decX], 250);
+	p2_eps2.moveTo([0, decX], 250);
 	p3_eps.moveTo([30, incX], 250);
 	p4_eps.moveTo([30, decX], 250);
+	board.create("line", [[0, incX], [0, decX]], {
+		straightFirst: false,
+		straightLast: false,
+		strokeWidth: 3,
+		strokeColor: "#0b0eb3"
+	});
 }
-
-
-
-
 
 function ejecutarEpsilon() {
 
@@ -209,6 +183,57 @@ function ejecutarEpsilon() {
 
 	animaSucesion();
 	animaRegion();
+
+	var inputHtml = document.getElementById('validaEpsilonTexto');
+	var inputEhtmlAccion = document.getElementById('validaEpsilonAccion')
+
+	var imprimeHtml = "<p>  Dada, \\( \\varepsilon    \\) = " + epsilon + " existe n \\( \\in  \\mathrm{I}\\!\\mathrm{N} \\) tal que para toda,    \\( n \\gt N     \\) se satisface que,  </p>"
+
+	imprimeHtml = imprimeHtml + "<p>  \\( \\vert  \\frac{n}{n+1}-1  \\vert   \\lt     \\) " + epsilon + "</p>"
+	imprimeHtml = imprimeHtml + "<p> \\( \\vert  \\frac{-1}{n+1}  \\vert  = \\frac{1}{n+1} \\lt  \\)" + epsilon + "</p>"
+
+	imprimeHtmlAccion = '<label for="inputVerificaEpsilon"> n > </label>';
+	imprimeHtmlAccion = imprimeHtmlAccion + '<input onchange="ejecutarValidacionEpsilon()"  type="number" id="inputVerificaEpsilon" value="0" max="3" min="0" step="0.1" >';
+
+
+	inputHtml.innerHTML = imprimeHtml;
+	inputEhtmlAccion.innerHTML = imprimeHtmlAccion;
+	MathJax.typeset();
+}
+
+
+function ejecutarValidacionEpsilon() {
+	var validaEpsilom = document.getElementById("inputVerificaEpsilon");
+
+	var valorValidar = ( (1 - epsilon) / epsilon );
+
+	if( valorValidar < parseFloat(validaEpsilom.value)){
+		swal({
+			title: "Exito!",
+			text: "El valor: " + validaEpsilom.value + " es correcto.",
+			icon: "success"
+		});
+
+	 incy = parseFloat(limite) + parseFloat(epsilon);
+	 decy = parseFloat(limite) - parseFloat(epsilon);
+		board.create('polygon', [[valorValidar,decy], [valorValidar, incy], [30, incy], [30,decy]], {
+			borders: {
+				strokeColor: 'black',
+				dash: 2,
+			},
+			fillOpacity: 0.08,
+			fillColor: "0b268a",
+			vertices:{visible:false}
+		});
+
+
+	}else{
+		swal({
+			title: "Error!",
+			text: "El valor: " + validaEpsilom.value + " no es correcto.",
+			icon: "error"
+		});
+	}
 
 }
 
